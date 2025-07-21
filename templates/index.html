@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VPN IP Detection</title>
+</head>
+<body>
+    <h1>IP Detection Results</h1>
+    <p><strong>Remote IP:</strong> {{ remote_ip }}</p>
+    <p><strong>X-Forwarded-For:</strong> {{ forwarded_ip }}</p>
+    <p><strong>X-Real-IP:</strong> {{ real_ip }}</p>
+    <p><strong>User-Agent:</strong> {{ user_agent }}</p>
+
+    <h2>WebRTC IP Leak Test</h2>
+    <pre id="webrtc_result">Scanning...</pre>
+
+    <script>
+        const output = document.getElementById("webrtc_result");
+
+        const pc = new RTCPeerConnection({iceServers: []});
+        pc.createDataChannel("");
+        pc.createOffer().then(offer => pc.setLocalDescription(offer));
+
+        pc.onicecandidate = event => {
+            if (event.candidate) {
+                const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3})/;
+                const ipMatch = ipRegex.exec(event.candidate.candidate);
+                if (ipMatch) {
+                    const ip = ipMatch[1];
+                    output.innerText += "Potential Real IP via WebRTC: " + ip + "\n";
+                }
+            }
+        };
+    </script>
+</body>
+</html>
