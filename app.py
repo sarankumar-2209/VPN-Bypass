@@ -35,3 +35,6 @@ User-Agent       : {user_agent}
                            forwarded_ip=forwarded_ip,
                            real_ip=real_ip,
                            user_agent=user_agent)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
